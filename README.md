@@ -1,87 +1,43 @@
 # keras-bert-ner
 
-Named entity recognition built on top of BERT and keras-bert. 
+Dockerized version of the Named entity recognition built on top of BERT 
+and keras-bert. 
 
-## Dependencies:
+## Dependencies
 
-bert (added as submodule to this project. FullTokenizer is used instead of keras-bert tokenizer)
+### Python
 
-keras-bert (https://pypi.org/project/keras-bert/)
+Python < 3.8 and TensorFlow 1 (here cpu version is used). See 
+[Issue #4](https://github.com/spyysalo/keras-bert-ner/issues/4) and
+[fi-ner-eval](https://github.com/aajanki/fi-ner-eval#turku-ner).
 
-Pretrained BERT model, e.g. from:
-- https://github.com/TurkuNLP/FinBERT
-- https://github.com/google-research/bert
+### Model  
 
-input data e.g. from:
-- https://github.com/mpsilfve/finer-data
+[Latest model](https://turkunlp.org/fin-ner.html) (combined-ext-model-130220.tar.gz) 
+trained on Turku OntoNotes corpus is used.
 
-Input data is expected to be in CONLL:ish format where Token and Tag are tab separated. 
-First string on the line corresponds to Token and second string to Tag
-  
 ## Quickstart
 
-Get submodules
+### Development
 
 ```
-git submodule init
-git submodule update
+git clone --recurse-submodules <ADD repo>
+./load-model.sh
+docker build -t finbert-ner-dev -f Dockerfile.dev .
+docker run -it --rm -p 8000:8000 -v $(pwd):/app -u $(id -u):$(id -g) finbert-ner-dev bash
+FLASK_APP=serve.py flask run --host 0.0.0.0 --port 8000
 ```
 
-Get pretrained models and data
+Simple test call from outside of the container
 
 ```
-./scripts/get-models.sh
-./scripts/get-finer.sh
-./scripts/get-turku-ner.sh
+curl -X POST localhost:8000 -d 'text=Sauli asuu Salossa'
 ```
 
-Run an experiment on FiNER news data  (`run-finer-news.sh` trains, `predict-finer-news.sh` outputs predictions)
+### Usage
 
 ```
-./scripts/run-finer-news.sh
-./scripts/predict-finer-news.sh
-python compare.py data/finer-news/test.tsv finer-news-predictions.tsv 
-```
-
-Experiment on Turku NER corpus data (`run-turku-ner.sh` trains, `predict-turku-ner.sh` outputs predictions)
-
-```
-./scripts/run-turku-ner.sh
-./scripts/predict-turku-ner.sh
-python compare.py data/turku-ner/test.tsv turku-ner-predictions.tsv 
-```
-
-If in a Slurm environment, edit `scripts/slurm-run.sh` to match your setup and create virtual environment, e.g.
-
-```
-module purge
-module load tensorflow
-python -m venv venv
-source venv/bin/activate
-pip install -r requirements.txt
-```
-
-then run
-
-```
-sbatch scripts/slurm-run.sh scripts/run-finer-news.sh
-sbatch scripts/slurm-run.sh scripts/predict-finer-news.sh
-python compare.py data/finer-news/test.tsv finer-news-predictions.tsv
-```
-
-and
-
-```
-sbatch scripts/slurm-run.sh scripts/run-turku-ner.sh
-sbatch scripts/slurm-run.sh scripts/predict-turku-ner.sh
-python compare.py data/turku-ner/test.tsv turku-ner-predictions.tsv 
-```
-
-(the first jobs must finish before running the second ones.)
-
-For parameter selection in a Slurm environment, try
-
-```
-./slurm/run-parameter-grid.sh 
-python3 slurm/select_params.py logs/*.out
+docker build -t finbert-ner .
+docker run --rm -p 8000:8000 finbert-ner
+curl -X POST localhost:8000 -d 'text=Sauli asuu Salossa'
 ```
