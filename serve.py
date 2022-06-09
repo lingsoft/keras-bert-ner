@@ -1,4 +1,5 @@
 import os
+import sys
 
 from flask import Flask, request
 
@@ -21,7 +22,7 @@ def tag():
 def main(argv):
     argparser = argument_parser('serve')
     args = argparser.parse_args(argv[1:])
-    app.run(port=args.port)
+    app.run(host="0.0.0.0", port=args.port)
     return 0
 
 
