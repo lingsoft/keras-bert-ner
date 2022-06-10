@@ -1,15 +1,11 @@
-import os
 import sys
 import unicodedata
-
-from flask import Flask, request
 
 import numpy as np
 import tensorflow as tf
 
 from common import process_sentences, load_ner_model
 from common import encode, write_result
-from common import argument_parser
 
 
 class Tagger(object):
@@ -23,7 +19,7 @@ class Tagger(object):
 
     def tag(self, text, tokenized=False):
         max_seq_len = self.config['max_seq_length']
-        inv_label_map = { i: l for i, l in enumerate(self.labels) }
+        inv_label_map = {i: l for i, l in enumerate(self.labels)}
         if tokenized:
             words = text.split()    # whitespace tokenization
         else:
@@ -32,7 +28,8 @@ class Tagger(object):
         data = process_sentences([words], [dummy], self.tokenizer, max_seq_len)
         x = encode(data.combined_tokens, self.tokenizer, max_seq_len)
         if self.session is None or self.graph is None:
-            probs = self.model.predict(x, batch_size=8)    # assume singlethreaded
+            # assume singlethreaded
+            probs = self.model.predict(x, batch_size=8)
         else:
             with self.session.as_default():
                 with self.graph.as_default():
@@ -50,7 +47,8 @@ class Tagger(object):
 
     @classmethod
     def load(cls, model_dir):
-        # session/graph for multithreading, see https://stackoverflow.com/a/54783311
+        # session/graph for multithreading,
+        # see https://stackoverflow.com/a/54783311
         session = tf.compat.v1.Session()
         graph = tf.compat.v1.get_default_graph()
         with graph.as_default():
@@ -69,10 +67,8 @@ punct_chars = set([
          (i >= 91 and i <= 96) or (i >= 123 and i <= 126)))
 ])
 
-translation_table = str.maketrans({ c: ' '+c+' ' for c in punct_chars })
+translation_table = str.maketrans({c: ' '+c+' ' for c in punct_chars})
 
 
 def tokenize(text):
     return text.translate(translation_table).split()
-
-

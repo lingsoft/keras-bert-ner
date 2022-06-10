@@ -1,20 +1,17 @@
 import os
 import sys
 import json
-import numpy as np
-import conlleval
-
 from itertools import tee
 from collections import deque, namedtuple
 from argparse import ArgumentParser
 
 os.environ['TF_KERAS'] = '1'
-
+import numpy as np
 from tensorflow import keras
-import bert_tokenization as tokenization
 from keras_bert import load_trained_model_from_checkpoint, AdamWarmup
 from keras_bert import calc_train_steps, get_custom_objects
 
+import bert_tokenization as tokenization
 from config import DEFAULT_SEQ_LEN, DEFAULT_BATCH_SIZE, DEFAULT_EPOCHS
 from config import DEFAULT_LR, DEFAULT_WARMUP_PROPORTION
 
