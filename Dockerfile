@@ -2,7 +2,6 @@
 FROM python:3.7-slim as venv
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
-RUN apt-get update && apt-get -y install --no-install-recommends wget
 WORKDIR /app
 RUN python -m venv /opt/venv
 ENV PATH="/opt/venv/bin:$PATH"
@@ -24,12 +23,13 @@ WORKDIR /elg
 COPY --chown=elg:elg \
     bert_tokenization.py \
     common.py \
+    config.py \
     conlleval.py \
     ner-model/* \
     serve.py \
     tagger.py \
     docker-entrypoint.sh /elg
-COPY --chown=elg:elg ./ner-model/* /elg/ner-model
+COPY --chown=elg:elg ./ner-model /elg/ner-model
 
 ENV PATH="/opt/venv/bin:$PATH"
 ENV PYTHON_PATH="/opt/venv/bin"
