@@ -24,7 +24,6 @@ COPY --chown=elg:elg \
     bert_tokenization.py \
     common.py \
     config.py \
-    ner-model/* \
     serve.py \
     tagger.py \
     docker-entrypoint.sh /elg/
