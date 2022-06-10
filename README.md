@@ -21,7 +21,7 @@ trained on Turku OntoNotes corpus is used.
 ### Development
 
 ```
-git clone --recurse-submodules <ADD repo>
+git clone -b dockerized https://github.com/lingsoft/keras-bert-ner.git
 ./load-model.sh
 docker build -t finbert-ner-dev -f Dockerfile.dev .
 docker run -it --rm -p 8000:8000 -v $(pwd):/app -u $(id -u):$(id -g) finbert-ner-dev bash
@@ -31,7 +31,7 @@ FLASK_APP=serve.py flask run --host 0.0.0.0 --port 8000
 Simple test call
 
 ```
-curl -X POST localhost:8000 -d 'text=Sauli asuu Salossa'
+curl -X POST localhost:8000 -d 'text=Vuonna 1978 Pauli asui Turussa'
 ```
 
 ### Usage
