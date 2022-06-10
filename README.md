@@ -28,7 +28,7 @@ docker run -it --rm -p 8000:8000 -v $(pwd):/app -u $(id -u):$(id -g) finbert-ner
 FLASK_APP=serve.py flask run --host 0.0.0.0 --port 8000
 ```
 
-Simple test call from outside of the container
+Simple test call
 
 ```
 curl -X POST localhost:8000 -d 'text=Sauli asuu Salossa'
@@ -39,5 +39,12 @@ curl -X POST localhost:8000 -d 'text=Sauli asuu Salossa'
 ```
 docker build -t finbert-ner .
 docker run --rm -p 8000:8000 finbert-ner
-curl -X POST localhost:8000 -d 'text=Sauli asuu Salossa'
 ```
+
+## Next steps
+
+- JSON requests and responses (elg branch).
+- Each worker requires about 3.5GB memory. Option --preload has some 
+  [issues](https://github.com/benoitc/gunicorn/issues/2369) with TensorFlow.
+- For better performance [TensorFlow Serving](https://www.tensorflow.org/tfx/guide/serving)
+  Convert hdf5 to savedModel format.
