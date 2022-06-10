@@ -24,16 +24,15 @@ COPY --chown=elg:elg \
     bert_tokenization.py \
     common.py \
     config.py \
-    conlleval.py \
     ner-model/* \
     serve.py \
     tagger.py \
-    docker-entrypoint.sh /elg
-COPY --chown=elg:elg ./ner-model /elg/ner-model
+    docker-entrypoint.sh /elg/
+COPY --chown=elg:elg ./ner-model /elg/ner-model/
 
 ENV PATH="/opt/venv/bin:$PATH"
 ENV PYTHON_PATH="/opt/venv/bin"
-ENV WORKERS=2
+ENV WORKERS=1
 ENV TIMEOUT=300
 ENV WORKER_CLASS=sync
 ENV LOG_LEVEL=info
