@@ -34,6 +34,16 @@ Simple test call
 curl -X POST localhost:8000 -d 'text=Vuonna 1978 Pauli asui Turussa'
 ```
 
+Response should be
+
+```
+Vuonna  B-DATE
+1978    I-DATE
+Pauli   B-PERSON
+asui    O
+Turussa B-GPE
+```
+
 ### Usage
 
 ```
