@@ -439,33 +439,29 @@ def read_data(input_file, tokenizer, max_seq_length):
 def write_result(fname, original, token_lengths, tokens, labels, predictions,
                  mode='train'):
     lines = []
-    with open(fname, 'w+') as f:
-        toks = deque([val for sublist in tokens for val in sublist])
-        labs = deque([val for sublist in labels for val in sublist])
-        pred = deque([val for sublist in predictions for val in sublist])
-        lengths = deque(token_lengths)
-        for sentence in original:
-            for word in sentence:
-                tok = toks.popleft()
-                # TODO avoid hardcoded '[UNK]' string
-                if not (word.startswith(tok) or tok == '[UNK]'):
-                    print('tokenization mismatch: "{}" vs "{}"'.format(
-                        word, tok), file=sys.stderr)
-                label = labs.popleft()
-                predicted = pred.popleft()
-                for i in range(int(lengths.popleft())-1):
-                    toks.popleft()
-                    labs.popleft()
-                    pred.popleft()
-                if mode != 'predict':
-                    line = '{}\t{}\t{}\n'.format(word, label, predicted)
-                else:
-                    # In predict mode, labels are just placeholder dummies
-                    line = '{}\t{}\n'.format(word, predicted)
-                f.write(line)
-                lines.append(line)
-            f.write('\n')
-    f.close()
+    toks = deque([val for sublist in tokens for val in sublist])
+    labs = deque([val for sublist in labels for val in sublist])
+    pred = deque([val for sublist in predictions for val in sublist])
+    lengths = deque(token_lengths)
+    for sentence in original:
+        for word in sentence:
+            tok = toks.popleft()
+            # TODO avoid hardcoded '[UNK]' string
+            if not (word.startswith(tok) or tok == '[UNK]'):
+                print('tokenization mismatch: "{}" vs "{}"'.format(
+                    word, tok), file=sys.stderr)
+            label = labs.popleft()
+            predicted = pred.popleft()
+            for i in range(int(lengths.popleft())-1):
+                toks.popleft()
+                labs.popleft()
+                pred.popleft()
+            if mode != 'predict':
+                line = '{}\t{}\t{}\n'.format(word, label, predicted)
+            else:
+                # In predict mode, labels are just placeholder dummies
+                line = '{}\t{}\n'.format(word, predicted)
+            lines.append(line)
     return lines
 
 
