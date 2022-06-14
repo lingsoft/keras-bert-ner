@@ -2,7 +2,6 @@ import os
 import sys
 import json
 import numpy as np
-import conlleval
 
 from itertools import tee
 from collections import deque, namedtuple
@@ -11,12 +10,11 @@ from argparse import ArgumentParser
 os.environ['TF_KERAS'] = '1'
 
 from tensorflow import keras
-import bert_tokenization as tokenization
+from . import bert_tokenization as tokenization
 from keras_bert import load_trained_model_from_checkpoint, AdamWarmup
 from keras_bert import calc_train_steps, get_custom_objects
 
-from config import DEFAULT_SEQ_LEN, DEFAULT_BATCH_SIZE, DEFAULT_EPOCHS
-from config import DEFAULT_LR, DEFAULT_WARMUP_PROPORTION
+from . import config as cfg
 
 
 Sentences = namedtuple('Sentences', [
@@ -49,7 +47,7 @@ def argument_parser(mode='train'):
             help='Initial checkpoint for pre-trained BERT model'
         )
         argparser.add_argument(
-            '--max_seq_length', type=int, default=DEFAULT_SEQ_LEN,
+            '--max_seq_length', type=int, default=cfg.DEFAULT_SEQ_LEN,
             help='Maximum input sequence length in WordPieces'
         )
         argparser.add_argument(
@@ -57,15 +55,15 @@ def argument_parser(mode='train'):
             help='Lower case input text (for uncased models)'
         )
         argparser.add_argument(
-            '--learning_rate', type=float, default=DEFAULT_LR,
+            '--learning_rate', type=float, default=cfg.DEFAULT_LR,
             help='Initial learning rate'
         )
         argparser.add_argument(
-            '--num_train_epochs', type=int, default=DEFAULT_EPOCHS,
+            '--num_train_epochs', type=int, default=cfg.DEFAULT_EPOCHS,
             help='Number of training epochs'
         )
         argparser.add_argument(
-            '--warmup_proportion', type=float, default=DEFAULT_WARMUP_PROPORTION,
+            '--warmup_proportion', type=float, default=cfg.DEFAULT_WARMUP_PROPORTION,
             help='Proportion of training to perform LR warmup for'
         )
     if mode == 'predict':
@@ -84,7 +82,7 @@ def argument_parser(mode='train'):
             help='Port to listen to'
         )
     argparser.add_argument(
-        '--batch_size', type=int, default=DEFAULT_BATCH_SIZE,
+        '--batch_size', type=int, default=cfg.DEFAULT_BATCH_SIZE,
         help='Batch size for training'
     )
     argparser.add_argument(
