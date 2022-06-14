@@ -1,4 +1,3 @@
-import os
 import sys
 import unicodedata
 
@@ -7,14 +6,10 @@ from flask import Flask, request
 import numpy as np
 import tensorflow as tf
 
-from common import process_sentences, load_ner_model
-from common import encode, write_result
-from common import argument_parser
+from . import common as cm
 
 
 DEFAULT_MODEL_DIR = 'ner-model'
-
-
 app = Flask(__name__)
 
 
@@ -42,8 +37,8 @@ class Tagger(object):
         else:
             words = tokenize(text)    # approximate BasicTokenizer
         dummy = ['O'] * len(words)
-        data = process_sentences([words], [dummy], self.tokenizer, max_seq_len)
-        x = encode(data.combined_tokens, self.tokenizer, max_seq_len)
+        data = cm.process_sentences([words], [dummy], self.tokenizer, max_seq_len)
+        x = cm.encode(data.combined_tokens, self.tokenizer, max_seq_len)
         if self.session is None or self.graph is None:
             probs = self.model.predict(x, batch_size=8)    # assume singlethreaded
         else:
@@ -55,7 +50,7 @@ class Tagger(object):
         for i, pred in enumerate(preds):
             pred_labels.append([inv_label_map[t]
                                 for t in pred[1:len(data.tokens[i])+1]])
-        lines = write_result(
+        lines = cm.write_result(
             'output.tsv', data.words, data.lengths,
             data.tokens, data.labels, pred_labels, mode='predict'
         )
@@ -68,7 +63,7 @@ class Tagger(object):
         graph = tf.get_default_graph()
         with graph.as_default():
             with session.as_default():
-                model, tokenizer, labels, config = load_ner_model(model_dir)
+                model, tokenizer, labels, config = cm.load_ner_model(model_dir)
                 tagger = cls(model, tokenizer, labels, config)
                 tagger.session = session
                 tagger.graph = graph
@@ -90,7 +85,7 @@ def tokenize(text):
 
 
 def main(argv):
-    argparser = argument_parser('serve')
+    argparser = cm.argument_parser('serve')
     args = argparser.parse_args(argv[1:])
     if args.ner_model_dir is None:
         args.ner_model_dir = DEFAULT_MODEL_DIR
